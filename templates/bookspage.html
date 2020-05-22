@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}books{% endblock %}
+
+{% block body %}
+<h1 class="text-center">Search Results </h1>
+<div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
+  <div class="card-header">{{details[1]}}</div>
+  <div class="card-body">
+    <h5 class="card-title">{{details[2]}}</h5>
+	<p class="card-text"> Author: {{details[1]}}</p>
+	<p class="card-text"> Title: {{details[2]}}</p>
+    <p class="card-text"> ISBN: {{details[0]}}</p>
+	<p class="card-text"> Publication: {{details[3]}}</p>
+  </div>
+</div>
+
+{% endblock %}

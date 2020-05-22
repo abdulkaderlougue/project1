@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+		<title> Book Review </title>
+	</head>
+	<header> 
+		
+		<h1> Welcome to the book review</h1>
+	</header>
+
+	<body>
+		<h2> Wanr to see what people say about a book? <br> No problem</h2>
+		<h3> Login into your account to See Reviews Or Sign up for free</h3>
+		<div> 
+			<ol>
+			{%for user in users %}
+			
+			<li> {{"Name: " + user.username + " Email: "+ user.email}}</li>
+			{%endfor%}
+			</ol>
+			
+		</div>
+		
+		<form>
+			<div class="form-row">
+				<div class="form-group col-md-6">
+				  <input name = "username" type="text" class="form-control" id="inputUsername" placeholder="Username" required>
+				</div>
+				<div class="form-group col-md-6">
+				  <input type="password" class="form-control" id="inputPassword" placeholder="Password" required>
+				</div>
+			</div>
+			<button class="btn btn-primary" type="submit">Login</button>
+		</form>
+	</body>
+
+</html>

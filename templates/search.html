@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}Book Review {% endblock %}
+
+{% block body %}
+<p> Please, Just use one method for a smooth result. Thank you for your cooperation</p>
+<form action="" method="post">
+	<div class="form-row">
+		<div class="form-group col-md-8">
+			<input name = "search_author" type="text" class="form-control" placeholder="Search by Author">
+			<button class="btn btn-primary" type="submit">Search Book</button>
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-8">
+			<input name = "search_isbn" type="text" class="form-control" placeholder="Search by ISBN">
+			<button class="btn btn-primary" type="submit">Search Book</button>
+		</div>
+		
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-8">
+			<input name = "search_title" type="text" class="form-control" placeholder="Search by title">
+			<button class="btn btn-primary" type="submit">Search Book</button>
+
+		</div>
+	</div>
+</form>
+{% if show == True %}
+<div class="list-group" name="seach_result">
+	{%for key in query_results.keys()%}
+	<a href="{{url_for('bookPage',id=key)}}" name = "elmt_selected" class="list-group-item list-group-item-action">{{query_results.get(key)}}</a>
+	{%endfor%}
+</div>
+{% endif %}
+{% endblock %}
