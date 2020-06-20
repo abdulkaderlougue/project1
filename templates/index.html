@@ -13,6 +13,13 @@
 </div>
 
 <div> 
+		<ol>
+	{%for review in reviews %}
+	
+	<li> {{review}}</li>
+	{%endfor%}
+	</ol>
+	
 	<ol>
 	{%for user in users %}
 	

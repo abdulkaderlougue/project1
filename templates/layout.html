@@ -4,7 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-   <!--  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
+	<!-- Font Awesome Icon Library -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<!-- for the jqery for the star rating -->	
+    <script src="http://code.jquery.com/jquery-1.9.1.js" type="text/javascript"></script>
+
     <title>Book review App | {% block title %}{% endblock %}</title>
   </head>
   <body>
@@ -35,6 +40,6 @@
       {% block body %}{% endblock %}
 	  		
     </div>
-
+	
   </body>
 </html>
