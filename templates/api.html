@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}Book Review {% endblock %}
+
+{% block body %}
+<h2> WELCOME TO Book Review API </h2>
+	<p> There is no API KEY NOR API SECRET to use the API as it is A very basic API. Feel free to browse around</p>
+	<p>A request of the api looks like this <a href={{url_for('index')+"/api"}}>domain/api/usbn </a></p>
+	<p> The result is a JSON that looks like this:</p>
+	<code> { <br>
+	  "author": The author of the book, <br>
+	  "average_score": the average rating of the book received from the site, <br>
+	  "isbn": the ISBN of the book, <br>
+	  "review_count": the number of review of the book received, <br>
+	  "title": the title of the book, <br>
+	  "year": the year of publication<br>
+	}
+	</code>
+{% endblock %}

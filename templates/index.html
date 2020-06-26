@@ -13,19 +13,18 @@
 </div>
 
 <div> 
-		<ol>
-	{%for review in reviews %}
-	
-	<li> {{review}}</li>
-	{%endfor%}
-	</ol>
-	
-	<ol>
-	{%for user in users %}
-	
-	<li> {{"username: " + user.username + " Email: "+ user.email}}</li>
-	{%endfor%}
-	</ol>
-		{{s}}	
+	<h2> Welcome to the book review app</h2>
+	<p> This is a simple app built with FLASK. This is my first ever FLASK App to practice my skills learnt from the Havard CS50 Web development course.</p>
+	<p> Lot of skills garnered from this project such as </p>
+	<ul>
+		<li>SQL querries</li>
+		<li>Working with SQLAlchemy</li>
+		<li> Database Management</li>
+		<li> Login/Registration </li>
+		<li> Sessions and HTTP requests</li>
+		<li> API requests from Goodread</li>
+		<li> Building my own API</li>
+		<li>And much more</li>
+	</ul>
 </div>
 {% endblock %}

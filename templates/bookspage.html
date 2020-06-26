@@ -12,25 +12,24 @@
 	<p class="card-text"> Title: {{details[2]}}</p>
     <p class="card-text"> ISBN: {{details[0]}}</p>
 	<p class="card-text"> Publication: {{details[3]}}</p>
+	<p class="card-text"> Number of ratings from goodreads website: {{details[5]}}</p>
+	<p class="card-text"> Average Rating from goodreads website: {{details[4]}}</p>
   </div>
 </div>
 <div class="all-reviews">
-	<h3>Reviews For this book:</h3>
+	<h4>Reviews For this book:</h4>
+	<ol>
 	{%for review in reviews %}
-	<p> {{review[0]}}</p>
+	<li> {{review[0]}}</li> 
 	{%endfor%}
+	</ol>
 </div>
-<div class="all-ratings">
-	<h3>Ratings For this book:</h3>
-	{%for rating in ratings %}
-	<p> {{rating[0]}}</p>
-	{%endfor%}
-</div>
-<div>
-{{ra}}
-{%if showRatingForm == True %}
-	<h2>Star Rating {{ra}}</h2>
 
+<div>
+
+{%if showReviewForms == True %}
+	<h2>Rate And Review "{{details[2]}}" by "{{details[1]}}"</h2>
+	
 	<div class="rating"> 
 		<input type="radio" name="rating" value="5" id="5">
 			<label for="5">☆</label> 
@@ -44,26 +43,19 @@
 			<label for="1">☆</label>
 
 	</div>
-	<form class="rateform" action="" method="post">
+	<form class="reviewform" action="{{url_for('bookPage',id=id)}}" method="post">
 		<input type="text" class="ratingVal" name="ratingVal">
-		<button class="autoSubmit"> send </button>
-	</form>
-{%else%}
-	<p> You have already rated this book, Thank you!!! </p>
-{% endif %}
-{{r}}
-{%if showReviewForm == True %}
-	<h2>Write a review {{r}}</h2>
-	<form class="review" action="" method="post">
 		<div class="form-group">
 			<label for="exampleFormControlTextarea1">Write a review for this book</label>
 			<textarea name="review" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-			<button type="submit" class="btn btn-primary">Send</button>
-	  </div>
+	    </div>
+		<button type="submit" class="btn btn-primary">Send</button>
+		<!-- <button class="autoSubmit"> send </button> -->
 	</form>
 {%else%}
 	<p> You have already written a review for this book, Thank you!!! </p>
 {% endif %}
+
 </div>
 
 
@@ -73,7 +65,7 @@
         var selValue = $("input[type='radio']:checked").val();
 		$('#ratingVal').html(selValue); // put the value of the rating into the div
 		$('input.ratingVal').attr('value',selValue);
-		$('.autoSubmit').click();
+		//$('.autoSubmit').click();
     });
    
 </script>

@@ -40,7 +40,10 @@ body {
     color: white;
 
 }
-.rateform{
+input[name=ratingVal] {
+    pointer-events: none;
+   }
+.ratingVal{
 	display: none;
 }
 

@@ -1,6 +1,6 @@
 import os
-
-from flask import Flask, session, render_template, request, flash, url_for, redirect
+import requests
+from flask import Flask, session, render_template, request, flash, url_for, redirect, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -34,7 +34,7 @@ for i in range(len(sqls)):
 	try:
 		db.execute(sqls[i])
 	except:
-		print("table already exists")
+		pass # meaning the table already exists
 
 #db.execute("INSERT INTO reviews(user_id,rating) VALUES(:user_id,:rating)",{"user_id":12,"rating":9})
 db.commit()
@@ -47,7 +47,7 @@ def index():
 	if session.get("log") == None:
 		session["log"] = False
 	s=session["log"]
-	return render_template("index.html",reviews = reviews,users=users,s=s)
+	return render_template("index.html")
 
 
 #register form
@@ -152,7 +152,7 @@ def search():
 	
 
 	
-@app.route("/bookPage/<string:id>", methods=["GET","POST"])
+@app.route("/bookPage/<string:id>", methods=['GET','POST'])
 def bookPage(id):
 	#details = []
 	#for results in query_results:
@@ -160,24 +160,26 @@ def bookPage(id):
 	if session["log"] == True:
 		details = db.execute("SELECT isbn, author, title, publication FROM books WHERE id=:id",{"id":id}).fetchone()
 		reviews = db.execute("SELECT review FROM reviews WHERE book_id=:id",{"id":id}).fetchall()
-		ratings = db.execute("SELECT rating FROM reviews WHERE book_id=:id",{"id":id}).fetchall()
+		#ratings = db.execute("SELECT rating FROM reviews WHERE book_id=:id",{"id":id}).fetchall()
 		current_user = session['username'] 
 		user_id = db.execute("SELECT id FROM users WHERE username=:current_user",{"current_user":current_user}).fetchone()[0] 
-		r=write_review("review",id,user_id)
-		ra=rate("ratingVal",id,user_id)
+		isbn = details[0]
+		# API REQUEST FROM GOODREADS
+		KEY = "o2yOgTDO1j7THwySt9qU8Q"
+		res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": KEY, "isbns": isbn})
+		data = res.json()
+		avg_rating = data['books'][0]["average_rating"]
+		nber_of_rating = data['books'][0]["work_ratings_count"]
+		details = list(details)
+		details.append(avg_rating)
+		details.append(nber_of_rating)
+		if alreadyReview(user_id,id) == False:
+			review("review","ratingVal",id,user_id)
+			showReviewForms = True # show the review space to the user if not reviewed yet hide otherwise
+		else:
+			showReviewForms = False
 
-		if alreadyReview(user_id,id)[1] == False:
-			r=write_review("review",id,user_id)
-			showReviewForm = True # show the review space to the user if not reviewed yet hide otherwise
-		else:
-			showReviewForm = False
-		# BAD CODE
-		if alreadyReview(user_id,id)[0] == False:
-			ra=rate("ratingVal",id,user_id)
-			showRatingForm = True # show the review space to the user if not reviewed yet hide otherwise
-		else:
-			showRatingForm = False
-		return render_template("bookspage.html",r=r,ra=ra,showRatingForm=showRatingForm,ratings=ratings,id=id, details = details,reviews=reviews,showReviewForm=showReviewForm)
+		return render_template("bookspage.html",id=id, details = details,reviews=reviews,showReviewForms=showReviewForms)
 	else:
 		flash("Not Allowed!!! Please, Login")
 		return redirect(url_for('login'))
@@ -195,16 +197,18 @@ def rate(formName,bookId,userId):
 		flash("Thank you for Your review",'success')
 	return user_rating
 
-def write_review(formName,bookId,userId):
+def review(reviewName,ratingName,bookId,userId):
 	user_review = "Write a rating for this book"
+	user_rating = "Rate this book"
 	if request.method=="POST":
-		user_review=request.form.get(formName) 
-		#isRated = db.execute("SELECT rating FROM reviews WHERE book_id=:bookId AND user_id=:userId",{"bookId":bookId,"userId":userId}).fetchone()
-		#if isRated == None:
-		db.execute("INSERT INTO reviews(book_id,user_id,review) VALUES(:bookId,:userId,:user_review)",{"bookId":bookId,"userId":userId,"user_review":user_review})
+		user_review=request.form.get(reviewName) 
+		user_rating = request.form.get(ratingName)
+		if user_rating != '': # rating should be an integer
+			user_rating = int(user_rating)
+		db.execute("INSERT INTO reviews(book_id,user_id,rating,review) VALUES(:bookId,:userId,:user_rating,:user_review)",{"bookId":bookId,"userId":userId,"userId":userId,"user_rating":user_rating,"user_review":user_review})
 		db.commit()
 		flash("Thank you for Your review")
-	return user_review
+	return [user_rating,user_review] # return the rating value and the review
 
 def alreadyReview(userId,bookId):
 #TODO: BAD CODE, SHOULD COME BACK TO IT
@@ -214,9 +218,46 @@ def alreadyReview(userId,bookId):
 	rating = db.execute("SELECT review FROM reviews WHERE book_id=:bookId AND user_id=:userId",{"bookId":bookId,"userId":userId}).fetchone()
 	isReviewed = False
 	isRated = False
-	if review is not None:
+	if review != None or rating !=  None:
 		isReviewed = True
-	#check for rating
-	if rating is not  None:
-		isRated = True
-	return [isRated,isReviewed]
+	return isReviewed
+
+@app.route("/api/<string:isbn>")
+def api(isbn):
+
+	details = db.execute("SELECT isbn, author, title, publication, id FROM books WHERE isbn=:isbn",{"isbn":isbn}).fetchone()
+	if details is None:
+		return jsonify({"error": "Invalid ISBN"}),404
+	bookId = details[4]
+	review_count = 0
+	rating_count = 0
+	rating_value = 0
+	all_reviews_and_ratings = 	db.execute("SELECT review, rating FROM reviews WHERE book_id=:bookId",{"bookId":bookId}).fetchall()
+
+	for review in all_reviews_and_ratings:
+		rev = review[0] #review
+		rat = review[1] # rating
+		
+		# this is put in case the user just rate and doesnt review or vise versa
+		if rev != None: #check if there is a review written
+			review_count += 1
+			
+		if rat != None: #check if there is a rating
+			rating_count += 1
+			rating_value += rat
+	if rating_count != 0:
+		avg_rating = rating_value/rating_count
+	else: 
+		avg_rating = 'No rating'
+	return jsonify({
+	"title": details[2],
+    "author": details[1],
+    "year": details[3],
+    "isbn": details[0],
+    "review_count": review_count,
+    "average_score": avg_rating,
+	})
+
+@app.route('/api')
+def apiPage():
+	return render_template("api.html")
